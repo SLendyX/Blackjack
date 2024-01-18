@@ -19,9 +19,12 @@ let sumDealer = 0;
 
 let sumDealerEl = document.getElementById("sumdealer-el")
 
-let hasStoped;
+let hasStoped = true;
+let gameOver = false;
 
-//test
+let bet = 20
+let betEl=document.getElementById("bet-el");
+betEl.textContent= "Current Bet: " + bet;
 
 
 function getRandomCard(player) {
@@ -46,50 +49,58 @@ function getRandomCard(player) {
 }
 
 function startGame() {
-    isAlive = true
-    hasBlackJack = false
-    hasStoped = false;
-    sum = 0, sumDealer = 0;
-    let firstCard = getRandomCard(true)
-    cards = [firstCard]
-    sum = firstCard
-    let secondCard = getRandomCard(true)
-    cards.push(secondCard)
-    sum+=secondCard
+    if(hasStoped){
+        isAlive = true
+        hasBlackJack = false
+        hasStoped = false;
+        sum = 0, sumDealer = 0;
+        let firstCard = getRandomCard(true)
+        cards = [firstCard]
+        sum = firstCard
+        let secondCard = getRandomCard(true)
+        cards.push(secondCard)
+        sum+=secondCard
 
-    let card = getRandomCard(false);
-    dealerCards = [card];
-    sumDealer=card;
-
-    renderGame()
+        let card = getRandomCard(false);
+        dealerCards = [card];
+        sumDealer=card;
+   
+        renderGame()
+    }
 }
 
 function renderGame() {
-    playerEl.textContent = Player.name + ": $" + Player.chips
+    if(Player.chips <=0)
+        gameOver=true;
 
-    cardsEl.textContent = "Cards: "
-    for (let i = 0; i < cards.length; i++) {
-        cardsEl.textContent += cards[i] + " "
-    }
+    if(!gameOver){
+        playerEl.textContent = Player.name + ": $" + Player.chips
 
-    dealerEl.textContent = "Dealer's Cards: ";
-    for(let i=0; i<dealerCards.length;i++){
-        dealerEl.textContent += dealerCards[i]+ " ";
-    }
-    
-    sumEl.textContent = "Sum: " + sum
-    sumDealerEl.textContent = "Sum: " + sumDealer;
+        cardsEl.textContent = "Cards: "
+        for (let i = 0; i < cards.length; i++) {
+            cardsEl.textContent += cards[i] + " "
+        }
 
-    if (sum <= 20) {
-        messageEl.textContent = "Do you want to draw a new card?"
-    } else if (sum === 21) {
-        hasBlackJack = true;
-        dealerDraw();
-    } else {
-        message = "You're out of the game!"
-        isAlive = false
-        getWinner(false, true);
-    }
+        dealerEl.textContent = "Dealer's Cards: ";
+        for(let i=0; i<dealerCards.length;i++){
+            dealerEl.textContent += dealerCards[i]+ " ";
+        }
+        
+        sumEl.textContent = "Sum: " + sum
+        sumDealerEl.textContent = "Sum: " + sumDealer;
+
+        if (sum <= 20) {
+            messageEl.textContent = "Do you want to draw a new card?"
+        } else if (sum === 21) {
+            hasBlackJack = true;
+            dealerDraw();
+        } else {
+            message = "You're out of the game!"
+            isAlive = false
+            getWinner(false, true);
+        }
+    }else
+        messageEl.textContent = "Game over!\nYou have lost all your money!"
     
 }
 
@@ -105,48 +116,60 @@ function newCard() {
 
 
 function dealerDraw(){
-    while(sumDealer <17){
-        let card = getRandomCard(false);
-        sumDealer+=card;
-        dealerCards.push(card);
-    }
+    if(!hasStoped && !gameOver){
+        while(sumDealer <17){
+            let card = getRandomCard(false);
+            sumDealer+=card;
+            dealerCards.push(card);
+        }
 
-    dealerEl.textContent = "Dealer's Cards: ";
-    for(let i=0; i<dealerCards.length;i++){
-        dealerEl.textContent+=dealerCards[i] + " ";
-    }
+        dealerEl.textContent = "Dealer's Cards: ";
+        for(let i=0; i<dealerCards.length;i++){
+            dealerEl.textContent+=dealerCards[i] + " ";
+        }
 
-    sumDealerEl.textContent = "Sum: " + sumDealer;
+        sumDealerEl.textContent = "Sum: " + sumDealer;
 
-    if(!hasStoped && isAlive){ 
+        if(!hasStoped && isAlive){ 
 
-        hasStoped = true;
-        if(sumDealer <=21){
-            if(sum > sumDealer)
-                getWinner(true, false); 
-            else if(sum < sumDealer)
-                getWinner(false, true);
-            else
-                getWinner(false, false);
-        }else
-            getWinner(true, false);
+            hasStoped = true;
+            if(sumDealer <=21){
+                if(sum > sumDealer)
+                    getWinner(true, false); 
+                else if(sum < sumDealer)
+                    getWinner(false, true);
+                else
+                    getWinner(false, false);
+            }else
+                getWinner(true, false);
 
+        }
     }
 }
 
 function getWinner(player, dealer){
     if(player && !dealer){
         messageEl.textContent = "You have won!";
-        Player.chips +=10;
+        Player.chips +=bet;
         if(hasBlackJack)
             messageEl.textContent = "You've got Blackjack!"
     }else if(!player && dealer){
         messageEl.textContent = "You have lost!";
-        Player.chips -=10;
+        Player.chips -=bet;
     }else{
         messageEl.textContent = "It's a tie!";
-        Player.chips +=5;
+        Player.chips +=bet/2;
     }
+    hasStoped = true
     
-    
+    playerEl.textContent = Player.name + ": $" + Player.chips
+}
+
+function getBet(amount){
+    if(amount === Infinity)
+        bet = Player.chips;
+    else
+        bet = amount;
+
+    betEl.textContent = "Current Bet: " + bet;
 }

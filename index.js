@@ -29,14 +29,17 @@ function getRandomCard(player) {
     if (randomNumber > 10) {
         return 10
     } else if (randomNumber === 1) {
-        if(sum <11 && player)
-            return 11
-        else
-            return 1
-        if(sumDealer <11 && !player)
-            return 11
-        else
-            return 1
+        if(player){
+            if(sum <11)
+                return 11
+            else
+                return 1
+        }else{
+            if(sumDealer <11)
+                return 11
+            else
+                return 1
+        }
     } else {
         return randomNumber
     }

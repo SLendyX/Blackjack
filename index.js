@@ -21,7 +21,7 @@ let sumDealerEl = document.getElementById("sumdealer-el")
 
 let hasStoped;
 
-
+//test
 
 
 function getRandomCard(player) {

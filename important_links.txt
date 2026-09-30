@@ -1,0 +1,2 @@
+documentatie pentru librarie svg carduri de joc: 
+- https://github.com/cardmeister/cardmeister.github.io
